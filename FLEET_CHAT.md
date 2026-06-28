@@ -117,7 +117,7 @@ Content-Type: application/json
 ```
 
 - The wrapper is serialized as **canonical JSON** (§3.3) and placed verbatim in `user_input`. No new request fields are introduced — Article XXV's envelope is untouched.
-- The brainstem returns its standard `/chat` response envelope; the `rapp-twin-chat-response/1.0` object (§1.3) is carried in the kernel's **`response`** field — the only reply field the kernel emits (alongside `session_id`). Correlate to the request by `session_id` and the echoed `nonce` / `event_id`.
+- The brainstem returns its standard `/chat` response envelope; the `rapp-twin-chat-response/1.0` object (§1.3) is carried in the kernel's **`response`** field — the kernel's reply field on the success envelope {response, session_id, agent_logs, voice_mode} the kernel emits (alongside `session_id`). Correlate to the request by `session_id` and the echoed `nonce` / `event_id`.
 
 ### 2.1 The interpreter is a drop-in agent, not a new route
 
