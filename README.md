@@ -58,6 +58,17 @@ RAPP-style brainstem's `agents/` directory. On load it injects
 is down) and records every call. Or implement [`SPEC.md` §2](SPEC.md) directly in any
 language — the mind can't tell the difference.
 
+## Hook in from your agent runtime
+
+A stdlib **MCP server** ([`leviathan_mcp.py`](leviathan_mcp.py)) exposes the fleet as
+tools, so **Claude Code, the GitHub Copilot CLI, Claude Desktop, Cursor, Cline** — any
+MCP client — drives it natively. One-liner for Claude Code:
+```bash
+claude mcp add leviathan --env HIVEMIND_NODES='{"alpha":"10.0.0.11"}' -- python3 /ABS/PATH/leviathan_mcp.py
+```
+Then ask it: *"run leviathan_up"*. Full per-runtime copy-paste (Copilot CLI, Cursor,
+Desktop, …) and non-MCP fallbacks (shell CLI, raw HTTP) are in **[HOOKUP.md](HOOKUP.md)**.
+
 ## Configure your fleet
 
 The shipped roster is a placeholder. Point Leviathan at your own bodies without
