@@ -21,7 +21,7 @@ The Leviathan Protocol (SPEC v1.0) drove a fleet of no-LLM bodies over `POST /ap
 
 `rapp-fleet-chat/1.0` closes both at once: the fleet rides **the canonical `/chat` wire**, carrying a **signed twin-chat event** that is **verified and allowlist-gated** before any `perform()` is reached. We do not harden a route that should not exist — we retire it and route fleet messaging the way the rest of the estate already routes social messaging (`rapp-resident` has carried this exact shape live, 67 verified events).
 
-This spec adds **no new brainstem symbols and no kernel edit**. It is delivered entirely as a **drop-in, ABI-conformant agent** (the `FleetChat` relay agent) plus a spine profile. The grail (`brainstem.py`) is never touched.
+This spec adds **no new brainstem symbols and no kernel edit**. It is PROPOSED (to-build) entirely as a **drop-in, ABI-conformant agent** (the `FleetChat` relay agent) plus a spine profile. The grail (`brainstem.py`) is never touched.
 
 ---
 
@@ -106,15 +106,14 @@ The body answers with the §6e response shape, carrying the agent's result:
 
 ## 2. Transport — `POST /chat` only
 
-A fleet command is delivered by **`POST /chat`** and nothing else. The brainstem `/chat` request envelope (Article XXV) is fixed and additive-only; the fleet uses its existing string field, so **any brainstem of any vintage accepts it without a code change**:
+A fleet command is PROPOSED (to-build) by **`POST /chat`** and nothing else. The brainstem `/chat` request envelope (Article XXV) is fixed and additive-only; the fleet uses its existing string field, so **any brainstem of any vintage accepts it without a code change**:
 
 ```http
 POST /chat  HTTP/1.1
 Content-Type: application/json
 
 { "user_input": "<canonical JSON of the rapp-commons-event/1.0 wrapper (§1.1)>",
-  "session_id": "<optional per-conversation GUID>",
-  "user_guid":  "<optional caller identity GUID>" }
+  "session_id": "<optional per-conversation GUID>", }
 ```
 
 - The wrapper is serialized as **canonical JSON** (§3.3) and placed verbatim in `user_input`. No new request fields are introduced — Article XXV's envelope is untouched.
