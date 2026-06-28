@@ -61,7 +61,27 @@ TOOLS = [
      "description": "Manufacture vetted capability FLEET-WIDE: install each spec, run its deterministic test, keep where it passes / prune where it fails. specs = [{name, code, test_args, expect, description}].",
      "inputSchema": {"type": "object", "properties": {
          "specs": {"type": "array", "items": {"type": "object"}}}, "required": ["specs"]}},
+    {"name": "rapp_route",
+     "description": "Ride the whole RAPP medium: given your SITUATION, crawl the spine and get which protocol(s) govern it + how to act. Works for any agent, RAPP or not.",
+     "inputSchema": {"type": "object", "properties": {
+         "situation": {"type": "string", "description": "what you're trying to do"}}, "required": ["situation"]}},
+    {"name": "rapp_north_star",
+     "description": "Pull the RAPP ecosystem's north star + the medium definition from the hydra-served roadmap.",
+     "inputSchema": {"type": "object", "properties": {}}},
 ]
+
+import urllib.request as _u  # noqa: E402
+
+
+def _hydra_json(repo, path):
+    for base in (f"https://raw.githubusercontent.com/kody-w/{repo}/main",
+                 f"https://cdn.jsdelivr.net/gh/kody-w/{repo}@main",
+                 f"https://raw.githack.com/kody-w/{repo}/main"):
+        try:
+            return json.loads(_u.urlopen(f"{base}/{path}", timeout=10).read())
+        except Exception:
+            continue
+    return None
 
 
 def _call(name, a):
@@ -88,6 +108,19 @@ def _call(name, a):
     if name == "leviathan_forge":
         out = leviathan.forge_batch(a["specs"])
         return "\n".join(f"{v['verdict']:<10} {v['agent']}  kept_on={v.get('kept_on', [])}" for v in out)
+    if name == "rapp_route":
+        reg = _hydra_json("rapp-spine", "registry.json") or {}
+        sit = (a.get("situation") or "").lower()
+        words = {w for w in sit.replace(",", " ").split() if len(w) > 3}
+        scored = sorted(((sum(1 for w in words if w in (r.get("situation","")+" "+r.get("why","")+" "+" ".join(r.get("use",[]))).lower()), r)
+                         for r in reg.get("router", [])), key=lambda x: -x[0])
+        hits = [r for s, r in scored[:3] if s > 0]
+        if not hits:
+            return "No direct route. Crawl the full spine: https://raw.githubusercontent.com/kody-w/rapp-spine/main/registry.json"
+        return "\n\n".join(f"→ USE: {', '.join(r['use'])}\n  situation: {r['situation']}\n  why: {r['why']}" for r in hits)
+    if name == "rapp_north_star":
+        rm = _hydra_json("rapp-roadmap", "roadmap.json") or {}
+        return json.dumps({"north_star": rm.get("north_star"), "the_medium": rm.get("the_medium")}, indent=2)
     raise ValueError(f"unknown tool {name}")
 
 
