@@ -118,17 +118,17 @@ Content-Type: application/json
 ```
 
 - The wrapper is serialized as **canonical JSON** (§3.3) and placed verbatim in `user_input`. No new request fields are introduced — Article XXV's envelope is untouched.
-- The brainstem returns its standard `/chat` response envelope; the `rapp-twin-chat-response/1.0` object (§1.3) is carried in **both** `response` and `assistant_response` (Article XXV mandates both keys forever). Correlate to the request by `nonce` / `event_id`.
+- The brainstem returns its standard `/chat` response envelope; the `rapp-twin-chat-response/1.0` object (§1.3) is carried in the kernel's **`response`** field — the only reply field the kernel emits (alongside `session_id`). Correlate to the request by `session_id` and the echoed `nonce` / `event_id`.
 
 ### 2.1 The interpreter is a drop-in agent, not a new route
 
-A `rapp-fleet-chat/1.0`-conformant body loads the **`FleetChat` relay agent** — an ordinary `BasicAgent` (frozen ABI: `metadata` + `perform(**kwargs) -> str`, auto-discovered from `agents/`). It is the **only** thing that interprets a fleet event. It MUST NOT add a REST route, MUST NOT patch `brainstem.py`, and MUST NOT introduce a new brainstem symbol. It is byte-portable to any unmodified brainstem.
+A `rapp-fleet-chat/1.0`-conformant body loads a fleet-chat relay agent — the **`FleetChat`** pattern (**to be built**; not yet a published agent). It is an ordinary `BasicAgent` (frozen ABI: `metadata` + `perform(**kwargs) -> str`, auto-discovered from `agents/`), and is the **only** thing that interprets a fleet event. It MUST NOT add a REST route, MUST NOT patch `brainstem.py`, and MUST NOT introduce a new brainstem symbol. It is byte-portable to any unmodified brainstem.
 
-`FleetChat` does four things, in order, on every event (§4.1): **verify → allowlist → dispatch → record+respond**.
+The `FleetChat` pattern does four things, in order, on every event (§4.1): **verify → allowlist → dispatch → record+respond**.
 
 ### 2.2 Deterministic recognition (canon-preserving, no throttle)
 
-The Leviathan no-LLM fast path is preserved without a second wire. `FleetChat` contributes a `system_context()` whose single instruction is: *"If `user_input` parses as a `rapp-commons-event/1.0` wrapper with `kind:"console"`, route it to the `FleetChat` agent verbatim and do not reason about its content."* Recognition is by **envelope shape**, not semantics, so the routing turn is trivial and deterministic — the body never spends a model on *deciding which agent to run* (the `payload.agent` already names it). This keeps fan-outs fast and off the shared Copilot token while staying 100 % on the `/chat` wire. The fast path is an optimization of *routing*, never a bypass of *verification* — §4.1 runs unconditionally.
+The Leviathan no-LLM fast path is preserved without a second wire. The `FleetChat` pattern contributes a `system_context()` whose single instruction is: *"If `user_input` parses as a `rapp-commons-event/1.0` wrapper with `kind:"console"`, route it to the fleet-chat relay agent verbatim and do not reason about its content."* Recognition is by **envelope shape**, not semantics, so the routing turn is trivial and deterministic — the body never spends a model on *deciding which agent to run* (the `payload.agent` already names it). This keeps fan-outs fast and off the shared Copilot token while staying 100 % on the `/chat` wire. The fast path is an optimization of *routing*, never a bypass of *verification* — §4.1 runs unconditionally.
 
 ---
 
@@ -159,7 +159,7 @@ For both signing and the `event_id` (§4.5): UTF-8, object keys **recursively so
 
 ### 3.4 The auth slot (forward to Entra)
 
-The wrapper reserves room for an additive bearer credential without a schema break: a body MAY require an **HMAC shared-secret bearer** (`BRAINSTEM_FLOCK_SECRET`, nonce + timestamp replay window) carried in the `/chat` request, validated by `FleetChat` before dispatch. This slot is **designed to later accept Entra Agent ID claims** (rapp-roadmap Phase 1) with no change to this spec — the token is additive to Mode A/B, never a replacement for them.
+The wrapper reserves room for an additive bearer credential without a schema break: a body MAY require an **HMAC shared-secret bearer** (`BRAINSTEM_FLOCK_SECRET`, nonce + timestamp replay window) carried in the `/chat` request, validated by the fleet-chat relay agent before dispatch. This slot is **designed to later accept Entra Agent ID claims** (rapp-roadmap Phase 1) with no change to this spec — the token is additive to Mode A/B, never a replacement for them.
 
 ---
 
@@ -270,7 +270,7 @@ A controller is conformant iff it delivers fleet commands **only** over `/chat` 
 }
 ```
 
-**8.2 — Body A reply (`200 OK`, in both `response` and `assistant_response`):**
+**8.2 — Body A reply (`200 OK`, in the kernel's `response` field):**
 
 ```json
 {
