@@ -8,6 +8,13 @@ intelligence is the only thing that thinks, and the nodes are interchangeable,
 Any intelligence can tap in: **drive** the network (be the mind) or **join** it (be a
 body). The contract between them is [`SPEC.md`](SPEC.md) — language-agnostic, ~2 pages.
 
+> 🐋 **Two senses of "Leviathan," one idea.** This repo is the **FLEET** — many *bodies*
+> acting as one mind (horizontal). Its complement is the **BEING** — many *cells* acting
+> as one organism (vertical, infinite depth), distributed as `.egg` files from
+> [kody-w/rapp-leviathan-hub](https://github.com/kody-w/rapp-leviathan-hub). They compose:
+> hatch a being on each body, then drive the fleet of beings as one mind. See
+> [the unified doctrine](https://github.com/kody-w/rapp-leviathan-hub/blob/main/UNIFIED.md).
+
 ---
 
 ## Why
