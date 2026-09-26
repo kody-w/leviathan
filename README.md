@@ -1,5 +1,9 @@
 # 🐋 Leviathan
 
+<!-- rapp1:network-header:start -->
+[![RAPP/1](https://kody-w.github.io/rapp-hive-public/portfolio/badges/leviathan.svg)](https://github.com/kody-w/rapp-hive-public/blob/main/portfolio/repos/leviathan.md) · **New to RAPP?** [Start here: get your Brainstem →](https://github.com/kody-w/rapp-installer#start-here)
+<!-- rapp1:network-header:end -->
+
 **One mind, many bodies.** A protocol and reference controller for driving a network
 of brainstem nodes as a single distributed organism — where *one* external
 intelligence is the only thing that thinks, and the nodes are interchangeable,
